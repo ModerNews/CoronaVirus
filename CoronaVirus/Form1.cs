@@ -17,49 +17,45 @@ namespace CoronaVirus
         public Form1()
         {
             InitializeComponent();
-            string data = Program.ToHTML("https://www.medonet.pl/zdrowie/zdrowie-dla-kazdego,zasieg-koronawirusa-covid-19--mapa-,artykul,43602150.html");
-            if (data != null)
+
+            CoronaVirusTotalCases.ReadOnly = true;
+            ActiveCases.ReadOnly = true;
+            MeetingIll.ReadOnly = true;
+            Contagion.ReadOnly = true;
+
+            string data1 = Program.ToHTML("https://www.medonet.pl/zdrowie/zdrowie-dla-kazdego,zasieg-koronawirusa-covid-19--mapa-,artykul,43602150.html");
+            string data2 = Program.ToHTML("http://populacja.population.city/polska/");
+            if (data1 != null && data2 !=null)
             {
-                string cases = (data.Substring(data.IndexOf("POTWIERDZONE PRZYPADKI") + 42, 6).Replace(" ", string.Empty));
+                string cases = (data1.Substring(data1.IndexOf("POTWIERDZONE PRZYPADKI") + 70, 7).Replace(" ", string.Empty));
                 CoronaVirusTotalCases.Text = cases;
 
-                int cured = int.Parse(data.Substring(data.IndexOf("WYZDROWIAŁO") + 34, 6).Replace(" ", string.Empty)); ;
+                int cured = int.Parse(data1.Substring(data1.IndexOf("WYZDROWIAŁO") + 66, 6).Replace(" ", string.Empty));
                 int ActivelyIll = int.Parse(cases) - cured;
                 ActiveCases.Text = ActivelyIll.ToString();
 
-                string data2 = Program.ToHTML("http://populacja.population.city/polska/");
                 int population = int.Parse((data2.Substring(data2.IndexOf("id=\"populationcounter\"") + 47, 10).Replace(" ", string.Empty)));
 
                 //w procentach
-                double ActivelyIllD = Convert.ToDouble(ActivelyIll);
-                double populationD = Convert.ToDouble(population);
-                double meetingProb = (ActivelyIllD / populationD * 100);
-                int n = meetingProb.ToString().Length - meetingProb.ToString().Replace("0", string.Empty).Length;
-                string meetingProbS = Math.Round(meetingProb, (3 + n)).ToString(); 
+                int n = (Convert.ToDouble(ActivelyIll) / Convert.ToDouble(population) * 100).ToString().Length - (Convert.ToDouble(ActivelyIll) / Convert.ToDouble(population) * 100).ToString().Replace("0", string.Empty).Length;
+                string meetingProbS = Math.Round((Convert.ToDouble(ActivelyIll) / Convert.ToDouble(population) * 100), (3 + n)).ToString("G3"); 
                 meetingProbS += "%";
                 MeetingIll.Text = meetingProbS;
 
-                int doneTests = int.Parse(data.Substring(data.IndexOf("WYKONANE TESTY - POLSKA") + 42, 9).Replace(" ", string.Empty));
-                int positive = int.Parse(cases);
-                double doneTestsD = Convert.ToDouble(doneTests);
-                double positiveD = Convert.ToDouble(positive);
-                double chance = positiveD / doneTestsD;
+                int doneTests = int.Parse(data1.Substring(data1.IndexOf("WYKONANE TESTY - POLSKA") + 71, 9).Replace(" ", string.Empty));
+                double chance = Convert.ToDouble(int.Parse(cases)) / Convert.ToDouble(doneTests);
 
-                double final = (chance * meetingProb);
+                double final = (chance * (Convert.ToDouble(ActivelyIll) / Convert.ToDouble(population) * 100));
                 n = final.ToString().Length - final.ToString().Replace("0", string.Empty).Length;
-                final = Math.Round(final, 3 + n);
-                string finalS = final.ToString();
-                finalS += "%";
+                string finalS = Math.Round(final, 3 + n).ToString("G3") + "%";
                 Contagion.Text = finalS;
 
-                Source.Text = "medonet.pl, populacja.population.city";
             }
             else {CoronaVirusTotalCases.Text ="Network error";
                 ActiveCases.Text = "Network error";
                 MeetingIll.Text = "Network error";
                 Contagion.Text = "Network error";
-                Source.Text = "Network error";
-                    }
+            }
 
         }
 
@@ -73,6 +69,31 @@ namespace CoronaVirus
         }
 
         private void textBox8_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Source_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start("http://populacja.population.city/polska/");
+        }
+
+        private void Contagion_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Dane_Click(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start("https://www.medonet.pl/zdrowie/zdrowie-dla-kazdego,zasieg-koronawirusa-covid-19--mapa-,artykul,43602150.html");
+        }
+
+        private void MeetingIll_TextChanged(object sender, EventArgs e)
         {
 
         }
